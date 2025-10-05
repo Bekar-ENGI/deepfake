@@ -1,0 +1,45 @@
+// Prisma Client generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Datasource configuration
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL") // Make sure DATABASE_URL is in your .env
+}
+
+// User model
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique // Unique email for login/signup
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  documents Document[]
+  profile   Profile?
+}
+
+model Document {
+  id         Int      @id @default(autoincrement())
+  filename   String
+  filetype   String
+  uploadedAt DateTime @default(now())
+
+  // Foreign key
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Profile {
+  id         Int      @id @default(autoincrement())
+  image      Bytes
+  uploadedAt DateTime @default(now())
+
+  // Foreign key
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
